@@ -1,1 +1,1 @@
-# Health-Risk-Prediction
+# Diabetes-Prediction
