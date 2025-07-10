@@ -1,0 +1,130 @@
+<!-- with open("templates/result.html", "w") as f:
+    f.write(""" -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediction Result</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css">
+    <style>
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #4f46e5 0%, #a5b4fc 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            animation: fadeIn 0.5s ease-in;
+        }
+        .container:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.25);
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        h1 {
+            color: #1e293b;
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            position: relative;
+            padding-left: 40px;
+        }
+        h1.high-risk {
+            color: #e74c3c;
+        }
+        h1.low-risk {
+            color: #2ecc71;
+        }
+        h1.error {
+            color: #e74c3c;
+            padding-left: 0;
+            text-align: center;
+        }
+        h1.high-risk i, h1.low-risk i {
+            position: absolute;
+            left: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #6366f1;
+            font-size: 24px;
+        }
+        p {
+            color: #1e293b;
+            font-size: 18px;
+            margin-bottom: 24px;
+            line-height: 1.5;
+        }
+        a {
+            display: inline-block;
+            background: linear-gradient(90deg, #6366f1, #4f46e5);
+            color: #ffffff;
+            padding: 14px 24px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-size: 18px;
+            font-weight: 600;
+            transition: background 0.3s ease, transform 0.2s ease, box-shadow 0.3s ease;
+        }
+        a:hover {
+            background: linear-gradient(90deg, #4f46e5, #312e81);
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+        a:active {
+            transform: scale(0.95);
+        }
+        @media (max-width: 600px) {
+            .container {
+                padding: 24px;
+            }
+            h1 {
+                font-size: 24px;
+                padding-left: 36px;
+            }
+            h1.error {
+                padding-left: 0;
+            }
+            h1.high-risk i, h1.low-risk i {
+                font-size: 20px;
+            }
+            p {
+                font-size: 16px;
+            }
+            a {
+                font-size: 16px;
+                padding: 12px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="{{ 'error' if prediction_text == 'Error' else 'high-risk' if 'High Risk' in prediction_text else 'low-risk' }}">
+            {% if prediction_text != 'Error' %}
+                <i class="fas fa-heart"></i>
+            {% endif %}
+            {{ prediction_text }}
+        </h1>
+        <p>{{ recommendation_text }}</p>
+        <a href="/">Back to Home</a>
+    </div>
+</body>
+</html>
+<!-- """)
+print("Updated result.html to center error message and set red color!") -->
