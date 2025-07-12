@@ -1,37 +1,64 @@
-
-from flask import Flask, request, render_template
-import pickle
+from fastapi import FastAPI, Form, Request
+from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
+import joblib
 import numpy as np
+from pydantic import BaseModel, conint, confloat
 
-app = Flask(__name__)
+app = FastAPI()
+templates = Jinja2Templates(directory="templates")
 
-# Load model and scaler
-with open('model.pkl', 'rb') as f:
-    model = pickle.load(f)
-with open('scaler.pkl', 'rb') as f:
-    scaler = pickle.load(f)
+# Load the pre-trained model and scaler
+scaler = joblib.load('scaler.pkl')
+model = joblib.load('model.pkl')
 
-@app.route('/')
-def home():
-    return render_template('index.html')
+# Pydantic model (optional, for API validation if needed later)
+class PredictionInput(BaseModel):
+    Glucose: confloat(ge=0)
+    BMI: confloat(ge=0)
+    Age: conint(ge=0)
+    FamilyHistory: conint(ge=0, le=1)
+    BloodPressure: confloat(ge=0)
+    DailySugarIntake: confloat(ge=0)
+    PhysicalActivity: confloat(ge=0)
+    Gender: conint(ge=0, le=1)
+    SmokingHistory: conint(ge=0, le=1)
+    DrinkingHistory: conint(ge=0, le=1)
 
-@app.route('/predict', methods=['POST'])
-def predict():
+@app.get("/", response_class=HTMLResponse)
+async def home(request: Request):
+    return templates.TemplateResponse("index.html", {"request": request})
+
+@app.post("/predict", response_class=HTMLResponse)
+async def predict(
+    request: Request,
+    Glucose: str = Form(...),  # Accept string input and convert manually
+    BMI: str = Form(...),
+    Age: str = Form(...),
+    FamilyHistory: str = Form(...),
+    BloodPressure: str = Form(...),
+    DailySugarIntake: str = Form(...),
+    PhysicalActivity: str = Form(...),
+    Gender: str = Form(...),
+    SmokingHistory: str = Form(...),
+    DrinkingHistory: str = Form(...)
+):
     try:
-        # Get form data in correct order
-        features = [float(request.form[col]) for col in [
-            'Glucose', 'BMI', 'Age', 'FamilyHistory', 'BloodPressure',
-            'DailySugarIntake', 'PhysicalActivity', 'Gender', 'SmokingHistory', 'DrinkingHistory'
-        ]]
-        # Scale features
-        scaled_features = scaler.transform([features])
-        # Predict
-        prediction = model.predict(scaled_features)[0]
-        risk_level = 'High Risk' if prediction == 1 else 'Low Risk'
-        recommendation = "Consult a healthcare provider and consider lifestyle changes, such as reducing sugar intake and increasing physical activity." if prediction == 1 else "Maintain a healthy lifestyle with balanced diet and regular exercise."
-        return render_template('result.html', prediction_text=f"Diabetes Risk: {risk_level}", recommendation_text=f"Recommendation: {recommendation}")
-    except Exception as e:
-        return render_template('result.html', prediction_text="Error", recommendation_text="An error occurred: Please enter valid numerical values")
+        # Convert string inputs to float/int where applicable
+        features = [
+            float(Glucose), float(BMI), float(Age), int(FamilyHistory),
+            float(BloodPressure), float(DailySugarIntake), float(PhysicalActivity),
+            int(Gender), int(SmokingHistory), int(DrinkingHistory)
+        ]
+        features_scaled = scaler.transform([features])
+        prediction = model.predict(features_scaled)[0]
+        prediction_text = 'Diabetes Risk: High Risk' if prediction == 1 else 'Diabetes Risk: Low Risk'
+        recommendation_text = 'Consult a doctor.' if prediction == 1 else 'Maintain a healthy lifestyle.'
+    except (ValueError, TypeError):
+        prediction_text = 'Error'
+        recommendation_text = 'Please enter valid numerical inputs.'
+    return templates.TemplateResponse("result.html", {"request": request, "prediction_text": prediction_text, "recommendation_text": recommendation_text})
 
 if __name__ == "__main__":
-    app.run(debug=True, host='0.0.0.0', port=5000)
+    import uvicorn
+    uvicorn.run(app, host="0.0.0.0", port=8000)
