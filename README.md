@@ -1,1 +1,1 @@
-# Diabetes-Prediction
+# SugarSense
